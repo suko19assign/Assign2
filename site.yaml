@@ -9,13 +9,15 @@
         mode: '0755'
 
     - name: Install Python 3 and pip
-        apt:
+      become: true
+      apt:
         name:
           - python3
           - python3-pip
         update_cache: yes
 
     - name: Install Flask
+      become: true
       pip:
         name: Flask
 
@@ -43,10 +45,9 @@
   become: true
   gather_facts: true
   tasks:
-    - name: Update cache
+    - name: Update apt cache
       apt:
         update_cache: yes
-        cache_valid_time: 3600
 
     - name: Install curl
       apt:
@@ -62,8 +63,10 @@
       template:
         src: ./haproxy.cfg.j2
         dest: /etc/haproxy/haproxy.cfg
+      vars:
+        haproxy_ip: "{{ hostvars['HAproxy']['ansible_default_ipv4']['address'] }}"
+      when: "'ansible_default_ipv4' in hostvars['HAproxy']"
                 
     - name: Restart haproxy
-      service:
-        name: haproxy
-        state: restarted
+      ansible.builtin.shell:
+        cmd: "sudo service haproxy restart"
