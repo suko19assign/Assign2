@@ -1,4 +1,4 @@
-Host Bastion
+Host bastionNSO
      HostName <bastion_ipAddress>
      User ubuntu
      IdentityFile ~/.ssh/id_rsa
@@ -7,22 +7,22 @@ Host devA
         Hostname <ipAddress>
         User ubuntu
         IdentityFile ~/.ssh/<ssh_id_rsa>
-        ProxyJump Bastion
+        ProxyJump bastionNSO
 
 Host devB
         Hostname <ipAddress>
         User ubuntu
         IdentityFile ~/.ssh/<ssh_id_rsa>
-        ProxyJump Bastion
+        ProxyJump bastionNSO
 
 Host devC
         Hostname <ipAddress>
         User ubuntu
         IdentityFile ~/.ssh/<ssh_id_rsa>
-        ProxyJump Bastion
+        ProxyJump bastionNSO
 
 Host HAproxy
      HostName <ipAddress>
      User ubuntu
      IdentityFile ~/.ssh/<ssh_id_rsa>
-     ProxyJump Bastion
+     ProxyJump bastionNSO
