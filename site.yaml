@@ -21,22 +21,6 @@
       pip:
         name: Flask
 
-    - name: Create systemd unit file for application2
-      copy:
-        src: ./application2.service
-        dest: /etc/systemd/system/application2.service
-        mode: '0777'
-
-    - name: Reload systemd
-      systemd:
-        daemon_reload: yes
-
-    - name: Enable and start application2 service
-      systemd:
-        name: application2.service
-        state: started
-        enabled: yes
-
     - name: apt update
       apt:
         update_cache: true
