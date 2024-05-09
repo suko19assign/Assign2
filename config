@@ -1,7 +1,7 @@
 Host bastionNSO
      HostName <bastion_ipAddress>
      User ubuntu
-     IdentityFile ~/.ssh/id_rsa
+     IdentityFile ~/.ssh/<ssh_id_rsa>
 
 Host devA
         Hostname <ipAddress>
