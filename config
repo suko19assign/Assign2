@@ -7,21 +7,22 @@ Host devA
         Hostname <ipAddress>
         User ubuntu
         IdentityFile ~/.ssh/<ssh_id_rsa>
-        ProxyCommand ssh -W %h:%p Bastion
+        ProxyJump Bastion
 
 Host devB
         Hostname <ipAddress>
         User ubuntu
         IdentityFile ~/.ssh/<ssh_id_rsa>
-        ProxyCommand ssh -W %h:%p Bastion
+        ProxyJump Bastion
 
 Host devC
         Hostname <ipAddress>
         User ubuntu
         IdentityFile ~/.ssh/<ssh_id_rsa>
-        ProxyCommand ssh -W %h:%p Bastion
+        ProxyJump Bastion
 
 Host HAproxy
      HostName <ipAddress>
      User ubuntu
      IdentityFile ~/.ssh/<ssh_id_rsa>
+     ProxyJump Bastion
