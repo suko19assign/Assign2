@@ -1,46 +1,57 @@
 global
-	log /dev/log	local0
-	log /dev/log	local1 notice
-	chroot /var/lib/haproxy
-	stats socket /run/haproxy/admin.sock mode 660 level admin
-	stats timeout 30s
-	user haproxy
-	group haproxy
-	daemon
-
-	# Default SSL material locations
-	ca-base /etc/ssl/certs
-	crt-base /etc/ssl/private
-
-	# Default ciphers to use on SSL-enabled listening sockets.
-	# For more information, see ciphers(1SSL). This list is from:
-	#  https://hynek.me/articles/hardening-your-web-servers-ssl-ciphers/
-	ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256::RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
-	ssl-default-bind-options no-sslv3
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+    stats socket /var/lib/haproxy/stats
 
 defaults
-	log	global
-	mode	http
-	option	httplog
-	option	dontlognull
-        timeout connect 5000
-        timeout client  50000
-        timeout server  50000
-	errorfile 400 /etc/haproxy/errors/400.http
-	errorfile 403 /etc/haproxy/errors/403.http
-	errorfile 408 /etc/haproxy/errors/408.http
-	errorfile 500 /etc/haproxy/errors/500.http
-	errorfile 502 /etc/haproxy/errors/502.http
-	errorfile 503 /etc/haproxy/errors/503.http
-	errorfile 504 /etc/haproxy/errors/504.http
+    mode http
+    log global
+    option httplog
+    option dontlognull
+    timeout connect 5000ms
+    timeout client  50000ms
+    timeout server  50000ms
+    errorfile 400 /etc/haproxy/errors/400.http
+    errorfile 403 /etc/haproxy/errors/403.http
+    errorfile 408 /etc/haproxy/errors/408.http
+    errorfile 500 /etc/haproxy/errors/500.http
+    errorfile 502 /etc/haproxy/errors/502.http
+    errorfile 503 /etc/haproxy/errors/503.http
+    errorfile 504 /etc/haproxy/errors/504.http
 
-frontend web
+frontend http_front
     bind *:80
-    default_backend web_servers
-
-backend web_servers
-	mode http
+    mode http
+    default_backend http_back
+    
+backend http_back
+    mode http
     balance roundrobin
-{% for server in groups['webservers'] %}
-    server  {{ server }} {{ hostvars[server]['ansible_default_ipv4']['address'] }}:80 check
+        stats enable
+        stats uri /haproxy?stats
+        balance roundrobin
+        {% for host in groups["webservers"] %}
+        server {{ host }} {{ hostvars[host]["ansible_default_ipv4"]["address"] }}:5000 check
 {% endfor %}
+
+
+## commented out as it was used for local testing.
+#backend http_back
+#    balance roundrobin
+#    server devA 10.0.0.18:80 check
+#    server devB 10.0.0.48:80 check
+#    server devC 10.0.0.186:80 check
+
+listen stats
+    bind *:8011
+    stats enable
+    stats uri /stats
+    stats refresh 1s
+    stats auth admin:<%= lookup('file', 'uipassword') %>
+
